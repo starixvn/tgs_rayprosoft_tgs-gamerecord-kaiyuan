@@ -114,7 +114,8 @@ namespace Tgs.GameRecord.KaiyuanService.Core.ApplicationServices
 
                 await _messageSender.PublishAsync(
                     _subject,
-                    messageRequest.ToBson()).ConfigureAwait(false);
+                    messageRequest.ToBson(),
+                    cancellationToken).ConfigureAwait(false);
 
                 if (success)
                 {
