@@ -5,14 +5,14 @@ using Tgs.GameRecordSchedules.Protos;
 
 namespace Tgs.GameRecord.KaiyuanService.Core
 {
-    internal class GameRecordScheduleService : IGameRecordScheduleService
+    internal class GameRecordScheduleRepository : IGameRecordSchedule
     {
         private readonly GameRecordInfoOptions _gameRecordInfo;
         private readonly IGameRecordSchedulesGrpc _gameRecordSchedulesGrpc;
         private readonly ISystemClock _systemClock;
 
-        public GameRecordScheduleService(
-             IOptions<GameRecordInfoOptions> options,
+        public GameRecordScheduleRepository(
+            IOptions<GameRecordInfoOptions> options,
             IGameRecordSchedulesGrpc gameRecordSchedulesGrpc,
             ISystemClock systemClock)
         {

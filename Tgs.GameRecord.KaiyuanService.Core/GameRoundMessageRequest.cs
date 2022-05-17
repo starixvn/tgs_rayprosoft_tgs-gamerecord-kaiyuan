@@ -2,7 +2,7 @@
 
 namespace Tgs.GameRecord.KaiyuanService.Core
 {
-    public record GameRoundMessageModel
+    public record GameRoundMessageRequest
     {
         public string ExternalRoundId { get; init; } = default!;
         public Guid GameProviderId { get; init; }

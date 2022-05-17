@@ -9,16 +9,16 @@ namespace Tgs.GameRecord.KaiyuanService.Core.JobWorkerServices
     internal class KaiyuanJobWorkerCommandService : ICommandService<KaiyuanJobWorkerCommand>
     {
         private readonly GameRecordInfoOptions _gameRecordInfo;
-        private readonly IGameRecordScheduleService _gameRecordScheduleService;
+        private readonly IGameRecordSchedule _gameRecordScheduleService;
         private readonly IGetService<GameRecordQuery, GameRecordResult> _getService;
         private readonly ILogger<KaiyuanJobWorkerCommandService> _logger;
-        private readonly IKaiyuanService _service;
+        private readonly IKaiyuan _service;
         private readonly ISystemClock _systemClock;
 
         public KaiyuanJobWorkerCommandService(
             IOptions<GameRecordInfoOptions> options,
-            IKaiyuanService service,
-            IGameRecordScheduleService gameRecordScheduleService,
+            IKaiyuan service,
+            IGameRecordSchedule gameRecordScheduleService,
             ISystemClock systemClock,
             ILogger<KaiyuanJobWorkerCommandService> logger,
             IGetService<GameRecordQuery, GameRecordResult> getService)

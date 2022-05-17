@@ -1,4 +1,8 @@
-﻿using Tgs.GameProviders.Client;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using MongoDB.Bson;
+using Tgs.GameProviders.Client;
+using Tgs.MessageQueue;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameRecord.KaiyuanService.Core.ApplicationServices
@@ -6,17 +10,25 @@ namespace Tgs.GameRecord.KaiyuanService.Core.ApplicationServices
     internal class GameRecordService : IGetService<GameRecordQuery, GameRecordResult>
     {
         private readonly IGameRecordListClient _client;
-        private readonly IGameRecordMessageSender _messageSender;
-        private readonly IKaiyuanService _service;
+        private readonly GameRecordInfoOptions _gameRecordInfoOptions;
+        private readonly ILogger<GameRecordService> _logger;
+        private readonly IMessageSender _messageSender;
+        private readonly IKaiyuan _service;
+        private readonly string _subject;
 
         public GameRecordService(
+            IOptions<GameRecordInfoOptions> options,
+            ILogger<GameRecordService> logger,
             IGameRecordListClient client,
-            IGameRecordMessageSender messageSender,
-             IKaiyuanService service)
+            IMessageSender messageSender,
+            IKaiyuan service)
         {
+            _gameRecordInfoOptions = options.Value;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _client = client ?? throw new ArgumentNullException(nameof(client));
             _messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
             _service = service ?? throw new ArgumentNullException(nameof(service));
+            _subject = $"tgs.gp.gamerecord.database.round.{_gameRecordInfoOptions.GameProviderCode.ToLower()}";
         }
 
         public async ValueTask<GameRecordResult> GetAsync(GameRecordQuery query, CancellationToken cancellationToken = default)
@@ -72,7 +84,7 @@ namespace Tgs.GameRecord.KaiyuanService.Core.ApplicationServices
                     failCount++;
                 }
 
-                await _messageSender.SendGameRoundAsync(new GameRoundMessageModel()
+                var messageRequest = new GameRoundMessageRequest()
                 {
                     GameProviderCode = data.GameProviderCode,
                     GameProviderId = data.GameProviderId,
@@ -96,7 +108,13 @@ namespace Tgs.GameRecord.KaiyuanService.Core.ApplicationServices
                     ClientStatus = data.ClientStatus,
                     AdditionalData = data.AdditionalData,
                     Success = success
-                }).ConfigureAwait(false);
+                };
+
+                _logger.LogInformation("LogOn:{logOn}  Subject:{subject} MessageRequest:{request}", DateTime.Now.ToString("o"), _subject, messageRequest);
+
+                await _messageSender.PublishAsync(
+                    _subject,
+                    messageRequest.ToBson()).ConfigureAwait(false);
 
                 if (success)
                 {

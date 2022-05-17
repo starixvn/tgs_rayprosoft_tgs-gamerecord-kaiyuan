@@ -3,7 +3,7 @@ using Tgs.GameProviders.QueryServer.Models;
 
 namespace Tgs.GameRecord.KaiyuanService.Core
 {
-    public interface IKaiyuanService
+    public interface IKaiyuan
     {
         ValueTask<Guid?> BrandGetGameProviderConfigurationIdAsync(Guid brandId, Guid gameProviderId);
 

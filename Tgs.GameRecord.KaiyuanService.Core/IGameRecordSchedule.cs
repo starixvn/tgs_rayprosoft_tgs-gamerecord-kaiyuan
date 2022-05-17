@@ -2,7 +2,7 @@
 
 namespace Tgs.GameRecord.KaiyuanService.Core
 {
-    public interface IGameRecordScheduleService
+    public interface IGameRecordSchedule
     {
         ValueTask<GameRecordScheduleReply?> GetAsync(string brandCode, string agentId, string currencyCode, CancellationToken cancellationToken = default);
 

@@ -1,25 +1,26 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Tgs.GameProviders.Domains.SettingConfiguration;
-using Tgs.GameProviders.QueryServer.Client;
 using Tgs.GameProviders.QueryServer.Models;
 
 namespace Tgs.GameRecord.KaiyuanService.Core
 {
-    internal class KaiyuanService : IKaiyuanService
+    internal class KaiyuanMemoryCacheRepository : IKaiyuan
     {
-        private readonly IGameProvidersQueryServerClient _client;
+        private readonly TimeSpan _absoluteExpirationRelativeToNow;
         private readonly GameRecordInfoOptions _gameRecordInfo;
+        private readonly IKaiyuan _kaiyuan;
         private readonly IMemoryCache _memoryCache;
 
-        public KaiyuanService(
+        public KaiyuanMemoryCacheRepository(
+            TimeSpan absoluteExpirationRelativeToNow,
             IOptions<GameRecordInfoOptions> options,
-            IGameProvidersQueryServerClient client,
-            IMemoryCache memoryCache
-            )
+            IKaiyuan kaiyuan,
+            IMemoryCache memoryCache)
         {
+            _absoluteExpirationRelativeToNow = absoluteExpirationRelativeToNow;
             _gameRecordInfo = options.Value;
-            _client = client ?? throw new ArgumentNullException(nameof(client));
+            _kaiyuan = kaiyuan ?? throw new ArgumentNullException(nameof(kaiyuan));
             _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
         }
 
@@ -28,13 +29,13 @@ namespace Tgs.GameRecord.KaiyuanService.Core
             var key = $"{_gameRecordInfo.GameProviderCode}:{brandId}:{gameProviderId}";
             if (!_memoryCache.TryGetValue(key, out Guid? gameProviderConfigurationId))
             {
-                gameProviderConfigurationId = await _client.BrandGetGameProviderConfigurationIdAsync(brandId, gameProviderId).ConfigureAwait(false);
+                gameProviderConfigurationId = await _kaiyuan.BrandGetGameProviderConfigurationIdAsync(brandId, gameProviderId).ConfigureAwait(false);
 
                 if (gameProviderConfigurationId == null)
                 {
                     return null;
                 }
-                _ = _memoryCache.Set(key, gameProviderConfigurationId, TimeSpan.FromDays(1));
+                _ = _memoryCache.Set(key, gameProviderConfigurationId, absoluteExpirationRelativeToNow: _absoluteExpirationRelativeToNow);
             }
             return gameProviderConfigurationId;
         }
@@ -44,14 +45,12 @@ namespace Tgs.GameRecord.KaiyuanService.Core
             var key = $"{_gameRecordInfo.GameProviderCode}:{gameExternalId}";
             if (!_memoryCache.TryGetValue(key, out int? gameId))
             {
-                var gameModel = await _client.GameGetAsync(gameProviderId, gameExternalId).ConfigureAwait(false);
+                gameId = await _kaiyuan.GetGameIdAsync(gameProviderId, gameExternalId).ConfigureAwait(false);
 
-                if (gameModel == null)
+                if (gameId.HasValue)
                 {
-                    return null;
+                    _ = _memoryCache.Set(key, gameId, absoluteExpirationRelativeToNow: _absoluteExpirationRelativeToNow);
                 }
-                gameId = gameModel.GameId;
-                _ = _memoryCache.Set(key, gameId, TimeSpan.FromDays(1));
             }
             return gameId;
         }
@@ -60,8 +59,7 @@ namespace Tgs.GameRecord.KaiyuanService.Core
         {
             if (!_memoryCache.TryGetValue(_gameRecordInfo.GameProviderCode, out Guid? gameProviderId))
             {
-                gameProviderId = await _client.GameProviderGetGameProviderIdAsync(
-                    _gameRecordInfo.GameProviderCode).ConfigureAwait(false);
+                gameProviderId = await _kaiyuan.GetGameProviderIdAsync().ConfigureAwait(false);
 
                 if (gameProviderId.HasValue)
                 {
@@ -76,7 +74,7 @@ namespace Tgs.GameRecord.KaiyuanService.Core
             var key = $"{_gameRecordInfo.GameProviderCode}:{playerCode}";
             if (!_memoryCache.TryGetValue(key, out PlayerModel? playerModel))
             {
-                playerModel = await _client.PlayerGetAsync(playerCode).ConfigureAwait(false);
+                playerModel = await _kaiyuan.GetPlayerAsync(playerCode).ConfigureAwait(false);
 
                 if (playerModel == null)
                 {
@@ -88,6 +86,6 @@ namespace Tgs.GameRecord.KaiyuanService.Core
         }
 
         public ValueTask<KYConfiguration> GetSettingConfigurationAsync()
-            => _client.SettingGetConfigurationAsync<KYConfiguration>(_gameRecordInfo.GameProviderConfiguration)!;
+            => _kaiyuan.GetSettingConfigurationAsync();
     }
 }

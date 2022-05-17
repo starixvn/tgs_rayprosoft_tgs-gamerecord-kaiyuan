@@ -18,19 +18,20 @@ public static class ServiceCollecitonExtensions
         .AddOptions<GameRecordInfoOptions>()
         .Configure(configure)
         .Services
-        .Scan(scan =>
-        {
-            _ = scan.FromCallingAssembly()
-            .AddClasses(classes => classes.Where(t => t.Name.EndsWith("service", StringComparison.OrdinalIgnoreCase)))
-            .AsImplementedInterfaces()
-            .WithTransientLifetime();
-        })
         .RegisterAllServiceUtilityTypes(
             Assembly.GetExecutingAssembly(),
             ServiceLifetime.Transient)
+        .Scan(scan =>
+        {
+            _ = scan.FromCallingAssembly()
+            .AddClasses(classes => classes.Where(t => t.Name.EndsWith("repository", StringComparison.OrdinalIgnoreCase)))
+            .AsImplementedInterfaces()
+            .WithTransientLifetime();
+        })
         .AddGameProvidersQueryServerClient(gameProvidersQueryServerClientOptions)
         .AddGameRecordSchedulesClient(gameRecordSchedulesClientOptions)
         .AddGameProvidersClient(gameProvidersClientOptions)
         .AddScoped<ISystemClock, SystemClock>()
-        .AddScoped<IGameRecordMessageSender, GameRecordMessageSender>();
+        .AddTransient<IKaiyuan, KaiyuanRepository>()
+        .Decorate<IKaiyuan>((innerRepository, sp) => ActivatorUtilities.CreateInstance<KaiyuanMemoryCacheRepository>(sp, innerRepository, TimeSpan.FromHours(1)));
 }
