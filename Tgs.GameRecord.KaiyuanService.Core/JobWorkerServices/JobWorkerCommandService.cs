@@ -1,29 +1,24 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Tgs.GameRecord.KaiyuanService.Core.ApplicationServices;
-using Tgs.GameRecordSchedules.Protos;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameRecord.KaiyuanService.Core.JobWorkerServices
 {
-    internal class KaiyuanJobWorkerCommandService : ICommandService<KaiyuanJobWorkerCommand>
+    internal class JobWorkerCommandService : ICommandService<JobWorkerCommand>
     {
-        private readonly GameRecordInfoOptions _gameRecordInfo;
         private readonly IGameRecordSchedule _gameRecordScheduleService;
         private readonly IGetService<GameRecordQuery, GameRecordResult> _getService;
-        private readonly ILogger<KaiyuanJobWorkerCommandService> _logger;
+        private readonly ILogger<JobWorkerCommandService> _logger;
         private readonly IKaiyuan _service;
         private readonly ISystemClock _systemClock;
 
-        public KaiyuanJobWorkerCommandService(
-            IOptions<GameRecordInfoOptions> options,
+        public JobWorkerCommandService(
             IKaiyuan service,
             IGameRecordSchedule gameRecordScheduleService,
             ISystemClock systemClock,
-            ILogger<KaiyuanJobWorkerCommandService> logger,
+            ILogger<JobWorkerCommandService> logger,
             IGetService<GameRecordQuery, GameRecordResult> getService)
         {
-            _gameRecordInfo = options.Value;
             _service = service ?? throw new ArgumentNullException(nameof(service));
             _gameRecordScheduleService = gameRecordScheduleService ?? throw new ArgumentNullException(nameof(gameRecordScheduleService));
             _systemClock = systemClock ?? throw new ArgumentNullException(nameof(systemClock));
@@ -31,7 +26,7 @@ namespace Tgs.GameRecord.KaiyuanService.Core.JobWorkerServices
             _getService = getService ?? throw new ArgumentNullException(nameof(getService));
         }
 
-        public async ValueTask ExecuteAsync(KaiyuanJobWorkerCommand command, CancellationToken cancellationToken = default)
+        public async ValueTask ExecuteAsync(JobWorkerCommand command, CancellationToken cancellationToken = default)
         {
             var configuration = await _service.GetSettingConfigurationAsync().ConfigureAwait(false);
 
@@ -45,14 +40,6 @@ namespace Tgs.GameRecord.KaiyuanService.Core.JobWorkerServices
                     try
                     {
                         var sysTime = _systemClock.CurrentTime;
-
-                        var request = new GameRecordScheduleGetRequest()
-                        {
-                            GameProviderCode = _gameRecordInfo.GameProviderCode,
-                            BrandCode = brand.BrandCode,
-                            GameProviderAgentId = agent.AgentId,
-                            CurrencyCode = agent.CurrencyCode,
-                        };
 
                         var gameProviderSchedule =
                             await _gameRecordScheduleService.GetAsync(

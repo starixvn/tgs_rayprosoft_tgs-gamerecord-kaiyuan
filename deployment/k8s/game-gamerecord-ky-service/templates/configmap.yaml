@@ -6,7 +6,7 @@ metadata:
 data:
   appsettings.json: |
     {
-      "GameRecordKaiyuan": {
+      "GameRecord": {
         "GameRecordSchedulesBaseUrl": "http://game-gamerecordschedules",
         "GameProvidersQueryServerBaseUrl": "http://game-gameprovider-queryserver",
         "GameProvidersBaseUrl": "http://game-gameproviders"

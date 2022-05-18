@@ -52,17 +52,17 @@ builder.Services.AddKaiyuanServiceCore((options, sp) =>
 (options, sp) =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();
-    options.BaseUrl = configuration.GetValue<Uri>("GameRecordKaiyuan:GameProvidersQueryServerBaseUrl");
+    options.BaseUrl = configuration.GetValue<Uri>("GameRecord:GameProvidersQueryServerBaseUrl");
 },
 (options, sp) =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();
-    options.BaseUrl = configuration.GetValue<Uri>("GameRecordKaiyuan:GameRecordSchedulesBaseUrl");
+    options.BaseUrl = configuration.GetValue<Uri>("GameRecord:GameRecordSchedulesBaseUrl");
 },
 (options, sp) =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();
-    options.BaseUrl = configuration.GetValue<Uri>("GameRecordKaiyuan:GameProvidersBaseUrl");
+    options.BaseUrl = configuration.GetValue<Uri>("GameRecord:GameProvidersBaseUrl");
 });
 
 builder.Services

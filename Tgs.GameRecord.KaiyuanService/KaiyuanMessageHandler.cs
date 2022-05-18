@@ -9,11 +9,11 @@ namespace Tgs.GameRecord.KaiyuanService
     internal class KaiyuanMessageHandler : IMessageHandler
     {
         private readonly ILogger<KaiyuanMessageHandler> _logger;
-        private readonly ICommandService<KaiyuanJobWorkerCommand> _service;
+        private readonly ICommandService<JobWorkerCommand> _service;
 
         public KaiyuanMessageHandler(
             ILogger<KaiyuanMessageHandler> logger,
-            ICommandService<KaiyuanJobWorkerCommand> service
+            ICommandService<JobWorkerCommand> service
             )
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -33,7 +33,7 @@ namespace Tgs.GameRecord.KaiyuanService
 
             _logger.LogInformation("Information Received:{LogInfo}", messageModel);
 
-            return _service.ExecuteAsync(new KaiyuanJobWorkerCommand()
+            return _service.ExecuteAsync(new JobWorkerCommand()
             {
                 GameProviderCode = messageModel.GameProviderCode,
                 SendOn = messageModel.SendDateTime,
