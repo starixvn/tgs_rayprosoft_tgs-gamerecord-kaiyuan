@@ -11,6 +11,12 @@ data:
         "GameProvidersQueryServerBaseUrl": "http://game-gameprovider-queryserver",
         "GameProvidersBaseUrl": "http://game-gameproviders"
       }
+      "GameRecordInfo": {
+        "GameProviderCode": "KY",
+        "GameProviderConfiguration": "KYConfiguration",
+        "IntervalMinuteMax": 40,
+        "IntervalMinute": 5
+      }
     }
   monitor.settings.json: |
     {
