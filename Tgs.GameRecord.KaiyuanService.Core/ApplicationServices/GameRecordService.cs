@@ -13,21 +13,21 @@ namespace Tgs.GameRecord.KaiyuanService.Core.ApplicationServices
         private readonly GameRecordInfoOptions _gameRecordInfoOptions;
         private readonly ILogger<GameRecordService> _logger;
         private readonly IMessageSender _messageSender;
-        private readonly IKaiyuan _service;
         private readonly string _subject;
+        private readonly IUtensil _utensil;
 
         public GameRecordService(
             IOptions<GameRecordInfoOptions> options,
             ILogger<GameRecordService> logger,
             IGameRecordListClient client,
             IMessageSender messageSender,
-            IKaiyuan service)
+            IUtensil utensil)
         {
             _gameRecordInfoOptions = options.Value;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _client = client ?? throw new ArgumentNullException(nameof(client));
             _messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
-            _service = service ?? throw new ArgumentNullException(nameof(service));
+            _utensil = utensil ?? throw new ArgumentNullException(nameof(utensil));
             _subject = $"tgs.gp.gamerecord.database.round.{_gameRecordInfoOptions.GameProviderCode.ToLower()}";
         }
 
@@ -56,10 +56,10 @@ namespace Tgs.GameRecord.KaiyuanService.Core.ApplicationServices
             foreach (var data in response.Datas!)
             {
                 var success = true;
-                var gameProviderId = await _service.GetGameProviderIdAsync().ConfigureAwait(false);
+                var gameProviderId = await _utensil.GetGameProviderIdAsync().ConfigureAwait(false);
 
-                var playerModel = await _service.GetPlayerAsync(data.PlayerCode).ConfigureAwait(false);
-                var gameId = await _service.GetGameIdAsync(gameProviderId, data.ExternalGameId).ConfigureAwait(false);
+                var playerModel = await _utensil.GetPlayerAsync(data.PlayerCode).ConfigureAwait(false);
+                var gameId = await _utensil.GetGameIdAsync(gameProviderId, data.ExternalGameId).ConfigureAwait(false);
                 if (playerModel == null || !gameId.HasValue)
                 {
                     success = false;
@@ -68,7 +68,7 @@ namespace Tgs.GameRecord.KaiyuanService.Core.ApplicationServices
                 Guid? gameProviderConfigurationId = default;
                 if (playerModel != null)
                 {
-                    gameProviderConfigurationId = await _service.BrandGetGameProviderConfigurationIdAsync(playerModel.BrandId, gameProviderId).ConfigureAwait(false);
+                    gameProviderConfigurationId = await _utensil.BrandGetGameProviderConfigurationIdAsync(playerModel.BrandId, gameProviderId).ConfigureAwait(false);
                     if (!gameProviderConfigurationId.HasValue)
                     {
                         success = false;

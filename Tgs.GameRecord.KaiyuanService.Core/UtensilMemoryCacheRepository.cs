@@ -5,17 +5,17 @@ using Tgs.GameProviders.QueryServer.Models;
 
 namespace Tgs.GameRecord.KaiyuanService.Core
 {
-    internal class KaiyuanMemoryCacheRepository : IKaiyuan
+    internal class UtensilMemoryCacheRepository : IUtensil
     {
         private readonly TimeSpan _absoluteExpirationRelativeToNow;
         private readonly GameRecordInfoOptions _gameRecordInfo;
-        private readonly IKaiyuan _kaiyuan;
+        private readonly IUtensil _kaiyuan;
         private readonly IMemoryCache _memoryCache;
 
-        public KaiyuanMemoryCacheRepository(
+        public UtensilMemoryCacheRepository(
             TimeSpan absoluteExpirationRelativeToNow,
             IOptions<GameRecordInfoOptions> options,
-            IKaiyuan kaiyuan,
+            IUtensil kaiyuan,
             IMemoryCache memoryCache)
         {
             _absoluteExpirationRelativeToNow = absoluteExpirationRelativeToNow;

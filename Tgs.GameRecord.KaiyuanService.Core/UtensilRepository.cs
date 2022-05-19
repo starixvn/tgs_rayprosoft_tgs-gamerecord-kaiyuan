@@ -5,12 +5,12 @@ using Tgs.GameProviders.QueryServer.Models;
 
 namespace Tgs.GameRecord.KaiyuanService.Core
 {
-    internal class KaiyuanRepository : IKaiyuan
+    internal class UtensilRepository : IUtensil
     {
         private readonly IGameProvidersQueryServerClient _client;
         private readonly GameRecordInfoOptions _gameRecordInfo;
 
-        public KaiyuanRepository(
+        public UtensilRepository(
             IGameProvidersQueryServerClient client,
             IOptions<GameRecordInfoOptions> options)
         {
