@@ -106,6 +106,16 @@ builder.Services
             })
         .DeclareQueue("tgs.gp.gamerecord.database.round.ky");
     })
+     .AddNatsMessageQueue(natsConfig =>
+     {
+         _ = natsConfig
+         .ConfigQueueOptions((options, sp) =>
+         {
+             var configuration = sp.GetRequiredService<IConfiguration>();
+             options.Url = configuration.GetConnectionString("Nats");
+         })
+         .AddProcessor<ManualMessageHandler>("gp.gamerecord.manual.ky", "gp.gamerecord.manual");
+     })
     .ClearAllExchanges()
     .AddMongoGlobPatternExchange("tgs.gp.gamerecord.database.round.ky", "gp.gamerecord.database", "tgs.gp.gamerecord.database.round.ky");
 
