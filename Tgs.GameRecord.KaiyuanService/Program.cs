@@ -92,7 +92,7 @@ builder.Services
                         new Dictionary<string, object>());
                 };
             })
-            .AddHandler<KaiyuanMessageHandler>("gp.gamerecord.ky", false);
+            .AddHandler<ScheduleMessageHandler>("gp.gamerecord.ky", false);
     })
     .AddMongoMessageQueue(config =>
     {

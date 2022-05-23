@@ -38,7 +38,6 @@ namespace Tgs.GameRecord.KaiyuanService
             };
 
             return Encoding.UTF8.GetBytes(JsonSerializer.Serialize(response));
-
         }
     }
 }

@@ -6,13 +6,13 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.GameRecord.KaiyuanService
 {
-    internal class KaiyuanMessageHandler : IMessageHandler
+    internal class ScheduleMessageHandler : IMessageHandler
     {
-        private readonly ILogger<KaiyuanMessageHandler> _logger;
+        private readonly ILogger<ScheduleMessageHandler> _logger;
         private readonly ICommandService<JobWorkerCommand> _service;
 
-        public KaiyuanMessageHandler(
-            ILogger<KaiyuanMessageHandler> logger,
+        public ScheduleMessageHandler(
+            ILogger<ScheduleMessageHandler> logger,
             ICommandService<JobWorkerCommand> service
             )
         {
@@ -23,7 +23,7 @@ namespace Tgs.GameRecord.KaiyuanService
         public ValueTask HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
         {
             var json = Encoding.UTF8.GetString(data.Span);
-            var messageModel = JsonSerializer.Deserialize<KaiyuanMessageModel>(json);
+            var messageModel = JsonSerializer.Deserialize<ScheduleMessageModel>(json);
 
             if (messageModel == null)
             {
