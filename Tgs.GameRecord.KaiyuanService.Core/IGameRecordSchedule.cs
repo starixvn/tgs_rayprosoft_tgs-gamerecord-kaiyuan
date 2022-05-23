@@ -10,6 +10,6 @@ namespace Tgs.GameRecord.KaiyuanService.Core
 
         ValueTask<GameRecordScheduleReply?> InitAsync(Guid gameProviderId, string brandCode, string agentId, string currencyCode, CancellationToken cancellationToken = default);
 
-        ValueTask<GameRecordScheduleReply?> UpdateAsync(GameRecordScheduleReply gameProviderSchedule, DateTimeOffset? LastGameRecordTime, DateTimeOffset sysTime, CancellationToken cancellationToken = default);
+        ValueTask<GameRecordScheduleReply?> UpdateAsync(GameRecordScheduleReply gameProviderSchedule, DateTimeOffset? lastGameRecordTime, DateTimeOffset sysTime, CancellationToken cancellationToken = default);
     }
 }
