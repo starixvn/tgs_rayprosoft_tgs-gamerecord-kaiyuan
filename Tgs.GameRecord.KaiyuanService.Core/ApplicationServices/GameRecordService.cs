@@ -126,7 +126,7 @@ namespace Tgs.GameRecord.KaiyuanService.Core.ApplicationServices
             return new()
             {
                 Success = response.Success,
-                LastGameRecorTime = lastGameRecordTime,
+                LastGameRecordTime = lastGameRecordTime,
                 Count = response.Datas.Length,
                 SuccessCount = successCount,
                 FailCount = failCount
