@@ -117,10 +117,7 @@ namespace Tgs.GameRecord.KaiyuanService.Core.ApplicationServices
                     messageRequest.ToBson(),
                     cancellationToken).ConfigureAwait(false);
 
-                if (success)
-                {
-                    lastGameRecordTime = data.ExternalClosedOn.HasValue ? data.ExternalClosedOn : data.ExternalCreatedOn;
-                }
+                lastGameRecordTime = data.ExternalClosedOn.HasValue ? data.ExternalClosedOn : data.ExternalCreatedOn;
             };
 
             return new()
