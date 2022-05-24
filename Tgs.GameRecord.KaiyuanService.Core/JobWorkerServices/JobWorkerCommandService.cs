@@ -41,7 +41,7 @@ namespace Tgs.GameRecord.KaiyuanService.Core.JobWorkerServices
                     {
                         var sysTime = _systemClock.CurrentTime;
 
-                        var gameProviderSchedule =
+                        var schedule =
                             await _gameRecordSchedule.GetAsync(
                                 brand.BrandCode,
                                 agent.AgentId,
@@ -54,9 +54,9 @@ namespace Tgs.GameRecord.KaiyuanService.Core.JobWorkerServices
                                     agent.CurrencyCode,
                                     cancellationToken).ConfigureAwait(false);
 
-                        while (gameProviderSchedule != null)
+                        while (schedule != null)
                         {
-                            var config = _gameRecordSchedule.GetConfig(gameProviderSchedule);
+                            var config = _gameRecordSchedule.GetConfig(schedule);
                             if (config.EndTime >= sysTime)
                             {
                                 break;
@@ -71,7 +71,7 @@ namespace Tgs.GameRecord.KaiyuanService.Core.JobWorkerServices
                             }, cancellationToken).ConfigureAwait(false);
                             if (result.Success)
                             {
-                                gameProviderSchedule = await _gameRecordSchedule.UpdateAsync(gameProviderSchedule, result.LastGameRecordTime, sysTime, cancellationToken).ConfigureAwait(false);
+                                schedule = await _gameRecordSchedule.UpdateAsync(schedule, result.LastGameRecordTime, sysTime, cancellationToken).ConfigureAwait(false);
                             }
                             else
                             {
