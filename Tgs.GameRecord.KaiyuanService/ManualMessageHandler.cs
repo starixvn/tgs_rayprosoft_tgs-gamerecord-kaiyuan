@@ -33,7 +33,7 @@ namespace Tgs.GameRecord.KaiyuanService
                 Success = result.Success,
                 LastGameRecordTime = result.LastGameRecordTime,
                 SuccessCount = result.SuccessCount,
-                FailCount = result.FailCount,
+                FailureCount = result.FailureCount,
                 Count = result.Count
             };
 

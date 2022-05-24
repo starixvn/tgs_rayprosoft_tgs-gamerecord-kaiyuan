@@ -50,7 +50,7 @@ namespace Tgs.GameRecord.KaiyuanService.Core.ApplicationServices
             }
 
             var successCount = 0;
-            var failCount = 0;
+            var failureCount = 0;
             var lastGameRecordTime = default(DateTimeOffset?);
 
             foreach (var data in response.Datas!)
@@ -81,7 +81,7 @@ namespace Tgs.GameRecord.KaiyuanService.Core.ApplicationServices
                 }
                 else
                 {
-                    failCount++;
+                    failureCount++;
                 }
 
                 var messageRequest = new GameRoundMessageRequest()
@@ -129,7 +129,7 @@ namespace Tgs.GameRecord.KaiyuanService.Core.ApplicationServices
                 LastGameRecordTime = lastGameRecordTime,
                 Count = response.Datas.Length,
                 SuccessCount = successCount,
-                FailCount = failCount
+                FailureCount = failureCount
             };
         }
     }
