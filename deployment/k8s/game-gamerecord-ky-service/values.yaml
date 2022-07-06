@@ -5,13 +5,13 @@
 replicaCount: 1
 
 image:
-  repository: harbor.rpgp.cc/tgs/game-gamerecord-ky-service
+  repository: pgtgs/game-gamerecord-ky-service
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
 
 imagePullSecrets:
-  - name: secret-tgs-harbor
+  - name: dockerhub
 nameOverride: "game-gamerecord-ky-service"
 fullnameOverride: "game-gamerecord-ky-service"
 
