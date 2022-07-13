@@ -34,26 +34,24 @@ namespace Tgs.GameRecord.KaiyuanService.Core.ApplicationServices
         public async ValueTask<GameRecordResult> GetAsync(GameRecordQuery query, CancellationToken cancellationToken = default)
         {
             var response = await _client.KYGameRecordListAsync(
-                query.BrandCode,
-                query.CurrencyCode,
-                query.StartTime,
-                query.EndTime).ConfigureAwait(false);
+                brandCode: query.BrandCode,
+                currencyCode: query.CurrencyCode,
+                startTime: query.StartTime,
+                endTime: query.EndTime,
+                cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (response == null || !response.Success)
             {
                 return new() { Success = false };
             }
 
-            if (response.Success && response.Datas == null)
-            {
-                return new() { Success = true };
-            }
+            var datas = response.Datas ?? Enumerable.Empty<GameRecordModle>();
 
             var successCount = 0;
             var failureCount = 0;
             var lastGameRecordTime = default(DateTimeOffset?);
 
-            foreach (var data in response.Datas!)
+            foreach (var data in datas)
             {
                 var success = true;
                 var gameProviderId = await _utensil.GetGameProviderIdAsync().ConfigureAwait(false);
@@ -124,7 +122,7 @@ namespace Tgs.GameRecord.KaiyuanService.Core.ApplicationServices
             {
                 Success = response.Success,
                 LastGameRecordTime = lastGameRecordTime,
-                Count = response.Datas.Length,
+                Count = datas.Count(),
                 SuccessCount = successCount,
                 FailureCount = failureCount
             };
