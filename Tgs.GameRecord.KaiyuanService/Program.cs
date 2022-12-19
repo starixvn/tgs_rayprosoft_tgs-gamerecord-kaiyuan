@@ -67,33 +67,6 @@ builder.Services.AddKaiyuanServiceCore((options, sp) =>
 
 builder.Services
     .AddMessageQueue()
-    .AddRabbitMessageQueue(config =>
-    {
-        _ = config
-            .ConfigQueueOptions((options, sp) =>
-            {
-                var configuration = sp.GetRequiredService<IConfiguration>();
-
-                configuration.GetSection("RabbitMQ").Bind(options);
-
-                options.OnSetupQueueAndExchange = channel =>
-                {
-                    _ = channel.QueueDeclare(
-                        queue: "gp.gamerecord.ky",
-                        durable: true,
-                        exclusive: false,
-                        autoDelete: false,
-                        arguments: null);
-
-                    channel.QueueBind(
-                        "gp.gamerecord.ky",
-                        "amq.direct",
-                        $"tgs.gp.gamerecord.ky",
-                        new Dictionary<string, object>());
-                };
-            })
-            .AddHandler<ScheduleMessageHandler>("gp.gamerecord.ky", false);
-    })
     .AddMongoMessageQueue(config =>
     {
         _ = config
@@ -102,9 +75,8 @@ builder.Services
             sp => new MongoMessageQueueBuilderOptions
             {
                 MessageQueue = MongoMessageQueue.Default,
-                ConnectionString = sp.GetRequiredService<IConfiguration>().GetConnectionString("MongoMessaging")
-            })
-        .DeclareQueue("tgs.gp.gamerecord.database.round.ky");
+                ConnectionString = sp.GetRequiredService<IConfiguration>().GetConnectionString("MongoMessaging")!
+            });
     })
      .AddNatsMessageQueue(natsConfig =>
      {
@@ -112,8 +84,9 @@ builder.Services
          .ConfigQueueOptions((options, sp) =>
          {
              var configuration = sp.GetRequiredService<IConfiguration>();
-             options.Url = configuration.GetConnectionString("Nats");
+             options.Url = configuration.GetConnectionString("Nats")!;
          })
+         .AddHandler<ScheduleMessageHandler>("gp.gamerecord.schedule.ky", "gp.gamerecord.schedule")
          .AddProcessor<ManualMessageHandler>("gp.gamerecord.manual.ky", "gp.gamerecord.manual");
      })
     .ClearAllExchanges()
@@ -122,7 +95,7 @@ builder.Services
 builder.Services
      .AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
         sp => new ConfigureNamedOptions<OtlpExporterOptions>(
-            Microsoft.Extensions.Options.Options.DefaultName,
+            Options.DefaultName,
             exporterOptions =>
             {
                 var config = sp.GetRequiredService<IConfiguration>();
