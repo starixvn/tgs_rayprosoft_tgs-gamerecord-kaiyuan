@@ -1,7 +1,6 @@
-﻿namespace Tgs.GameRecord.KaiyuanService.Core
+﻿namespace Tgs.GameRecord.KaiyuanService.Core;
+
+public interface ISystemClock
 {
-    public interface ISystemClock
-    {
-        DateTimeOffset CurrentTime { get; }
-    }
+    DateTimeOffset CurrentTime { get; }
 }

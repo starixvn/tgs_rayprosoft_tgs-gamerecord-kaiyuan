@@ -1,9 +1,8 @@
-﻿namespace Tgs.GameRecord.KaiyuanService.Core
+﻿namespace Tgs.GameRecord.KaiyuanService.Core;
+
+public record ScheduleConfig
 {
-    public record ScheduleConfig
-    {
-        public DateTimeOffset StartTime { get; set; }
-        public DateTimeOffset EndTime { get; set; }
-        public DateTimeOffset LastGameRecordTime { get; set; }
-    }
+    public DateTimeOffset StartTime { get; set; }
+    public DateTimeOffset EndTime { get; set; }
+    public DateTimeOffset LastGameRecordTime { get; set; }
 }

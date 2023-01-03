@@ -1,42 +1,67 @@
 ﻿using Microsoft.Extensions.Options;
+using Tgs.GameCommand.Client;
+using Tgs.GameCommand.Common;
 using Tgs.GameProviders.Domains.SettingConfiguration;
-using Tgs.GameProviders.QueryServer.Client;
-using Tgs.GameProviders.QueryServer.Models;
 
-namespace Tgs.GameRecord.KaiyuanService.Core
+namespace Tgs.GameRecord.KaiyuanService.Core;
+
+internal class UtensilRepository : IUtensil
 {
-    internal class UtensilRepository : IUtensil
+    private readonly IGameCommandClient _client;
+    private readonly GameRecordInfoOptions _gameRecordInfo;
+
+    public UtensilRepository(
+        IGameCommandClient client,
+        IOptions<GameRecordInfoOptions> options)
     {
-        private readonly IGameProvidersQueryServerClient _client;
-        private readonly GameRecordInfoOptions _gameRecordInfo;
-
-        public UtensilRepository(
-            IGameProvidersQueryServerClient client,
-            IOptions<GameRecordInfoOptions> options)
-        {
-            _client = client ?? throw new ArgumentNullException(nameof(client));
-            _gameRecordInfo = options.Value;
-        }
-
-        public ValueTask<Guid?> BrandGetGameProviderConfigurationIdAsync(Guid brandId, Guid gameProviderId)
-            => _client.BrandGetGameProviderConfigurationIdAsync(brandId, gameProviderId);
-
-        public async ValueTask<int?> GetGameIdAsync(Guid gameProviderId, string gameExternalId)
-        {
-            var gameModel = await _client.GameGetAsync(gameProviderId, gameExternalId).ConfigureAwait(false);
-            return gameModel?.GameId;
-        }
-
-        public async ValueTask<Guid> GetGameProviderIdAsync()
-        {
-            var gameProviderId = await _client.GameProviderGetGameProviderIdAsync(_gameRecordInfo.GameProviderCode).ConfigureAwait(false);
-            return gameProviderId!.Value;
-        }
-
-        public ValueTask<PlayerModel?> GetPlayerAsync(string playerCode)
-            => _client.PlayerGetAsync(playerCode);
-
-        public ValueTask<KYConfiguration> GetSettingConfigurationAsync()
-            => _client.SettingGetConfigurationAsync<KYConfiguration>(_gameRecordInfo.GameProviderConfiguration)!;
+        _client = client ?? throw new ArgumentNullException(nameof(client));
+        _gameRecordInfo = options.Value;
     }
+
+    public ValueTask<Guid?> BrandGetGameProviderConfigurationIdAsync(
+        Guid brandId,
+        Guid gameProviderId,
+        CancellationToken cancellationToken = default)
+        => _client
+        .BrandGetGameProviderConfigurationIdAsync(
+            brandId: brandId,
+            gameProviderId: gameProviderId,
+            cancellationToken: cancellationToken);
+
+    public async ValueTask<int?> GetGameIdAsync(
+        Guid gameProviderId,
+        string gameExternalId,
+        CancellationToken cancellationToken = default)
+        => (await _client
+        .GameGetAsync(
+            gameProviderId,
+            gameExternalId,
+            cancellationToken)
+        .ConfigureAwait(false))?.GameId;
+
+    public async ValueTask<Guid> GetGameProviderIdAsync(
+        CancellationToken cancellationToken = default)
+    => await _client
+    .GameProviderGetGameProviderIdAsync(
+        gameProviderCode: _gameRecordInfo.GameProviderCode,
+        cancellationToken: cancellationToken)
+    .ConfigureAwait(false)
+    ?? throw new Exception($"The identifier for this game provider does not exist.({_gameRecordInfo.GameProviderCode})");
+
+    public ValueTask<PlayerInfo?> GetPlayerAsync(
+        string playerCode,
+        CancellationToken cancellationToken = default)
+        => _client
+        .PlayerGetAsync(
+            playerCode: playerCode,
+            cancellationToken: cancellationToken);
+
+    public async ValueTask<KYConfiguration> GetSettingConfigurationAsync(
+        CancellationToken cancellationToken = default)
+    => await _client
+    .SettingGetConfigurationAsync<KYConfiguration>(
+        key: _gameRecordInfo.GameProviderConfiguration,
+        cancellationToken: cancellationToken)
+    .ConfigureAwait(false)
+    ?? throw new Exception($"This Game Provider Configuration does not exist.({_gameRecordInfo.GameProviderConfiguration})");
 }

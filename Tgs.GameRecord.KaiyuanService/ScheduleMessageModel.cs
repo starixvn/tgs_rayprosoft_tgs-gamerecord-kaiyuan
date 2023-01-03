@@ -1,8 +1,7 @@
-﻿namespace Tgs.GameRecord.KaiyuanService
+﻿namespace Tgs.GameRecord.KaiyuanService;
+
+public record ScheduleMessageModel
 {
-    public record ScheduleMessageModel
-    {
-        public string GameProviderCode { get; init; } = default!;
-        public DateTimeOffset SendDateTime { get; init; }
-    }
+    public string GameProviderCode { get; init; } = default!;
+    public DateTimeOffset SendDateTime { get; init; }
 }
