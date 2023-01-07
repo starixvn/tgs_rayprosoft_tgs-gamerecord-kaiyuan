@@ -9,8 +9,9 @@ data:
       "GameRecordInfo": {
         "GameProviderCode": "KY",
         "GameProviderConfiguration": "KYConfiguration",
-        "IntervalMinuteMax": 40,
-        "IntervalMinute": 5
+        "IntervalMinutes": 5,
+        "IntervalMinutesMax": 30,
+        "IntervalMinutesMinimum": 1
       },
       "GameRecord": {
         "GameRecordSchedulesBaseUrl": "http://game-gamerecordschedules:9090/",

@@ -79,7 +79,7 @@ internal class GameRecordService : IGetService<GameRecordQuery, GameRecordResult
             if (playerModel != null)
             {
                 gameProviderConfigurationId = await _utensil
-                    .BrandGetGameProviderConfigurationIdAsync(
+                    .GetBrandGameProviderConfigurationIdAsync(
                         brandId: playerModel.BrandId,
                         gameProviderId: gameProviderId,
                         cancellationToken: cancellationToken)
