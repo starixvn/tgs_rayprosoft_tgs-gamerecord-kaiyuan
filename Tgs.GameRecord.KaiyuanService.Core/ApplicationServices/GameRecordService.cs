@@ -1,10 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Text.Json;
 using Microsoft.Extensions.Options;
-using MongoDB.Bson;
 using Tgs.GameProviders.Client;
-using Tgs.GameRounds.Common;
-using Tgs.GameRounds.Common.MessageModels;
-using Tgs.MessageQueue;
+using Tgs.GameRounds.WorkService.Client;
+using Tgs.GameRounds.WorkService.Common.Protos;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameRecord.KaiyuanService.Core.ApplicationServices;
@@ -13,24 +11,18 @@ internal class GameRecordService : IGetService<GameRecordQuery, GameRecordResult
 {
     private readonly IGameRecordListClient _client;
     private readonly GameRecordInfoOptions _gameRecordInfo;
-    private readonly ILogger<GameRecordService> _logger;
-    private readonly IMessageSender _messageSender;
-    private readonly MongoSettingOptions _mongoSetting;
+    private readonly IGameRoundsWorkServiceClient _gameRoundsWorkServiceClient;
     private readonly IUtensil _utensil;
 
     public GameRecordService(
-        ILogger<GameRecordService> logger,
         IOptions<GameRecordInfoOptions> gameRecordInfoOptions,
-        IOptions<MongoSettingOptions> mongoSettingOptions,
         IGameRecordListClient client,
-        IMessageSender messageSender,
+        IGameRoundsWorkServiceClient gameRoundsWorkServiceClient,
         IUtensil utensil)
     {
         _gameRecordInfo = gameRecordInfoOptions.Value;
-        _mongoSetting = mongoSettingOptions.Value;
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _client = client ?? throw new ArgumentNullException(nameof(client));
-        _messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
+        _gameRoundsWorkServiceClient = gameRoundsWorkServiceClient ?? throw new ArgumentNullException(nameof(gameRoundsWorkServiceClient));
         _utensil = utensil ?? throw new ArgumentNullException(nameof(utensil));
     }
 
@@ -95,48 +87,47 @@ internal class GameRecordService : IGetService<GameRecordQuery, GameRecordResult
 
             if (success)
             {
+                await _gameRoundsWorkServiceClient
+                .RoundBidding(
+                    gameProviderId: gameProviderId,
+                    gameProviderCode: _gameRecordInfo.GameProviderCode,
+                    externalRoundId: data.ExternalRoundId,
+                    gameId: gameId.Value,
+                    externalGameId: data.ExternalGameId,
+                    playerCode: playerModel!.PlayerCode,
+                    walletId: playerModel!.DefaultWalletId,
+                    currencyCode: playerModel!.DefaultWalletCurrencyCode,
+                    brandId: playerModel!.BrandId,
+                    gameProviderConfigurationId: gameProviderConfigurationId!.Value,
+                    status: (RoundBiddingStatus)data.Status,
+                    clientStatus: (RoundBiddingClientStatus)data.ClientStatus,
+                    externalCreatedOn: data.ExternalCreatedOn!.Value,
+                    externalClosedOn: data.ExternalClosedOn,
+                    bet: data.BetAmount.GetValueOrDefault(0),
+                    validBet: data.ValidBetAmount.GetValueOrDefault(0),
+                    settle: data.SettleAmount.GetValueOrDefault(0),
+                    commission: data.Commission.GetValueOrDefault(0),
+                    turnover: data.Turnover.GetValueOrDefault(0),
+                    playerWinLoss: data.PlayerWinLoss.GetValueOrDefault(0),
+                    additionalData: data.AdditionalData, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
                 successCount++;
             }
             else
             {
-                failureCount++;
-            }
-
-            var message = new GameRecordMessage(
-                ExternalRoundId: data.ExternalRoundId,
-                GameProviderId: gameProviderId,
-                GameProviderCode: _gameRecordInfo.GameProviderCode,
-                GameId: gameId ?? -1,
-                ExternalGameId: data.ExternalGameId,
-                PlayerCode: (playerModel == null) ? string.Empty : playerModel.PlayerCode,
-                CurrencyCode: (playerModel == null) ? string.Empty : playerModel.DefaultWalletCurrencyCode,
-                WalletId: (playerModel == null) ? Guid.Empty : playerModel.DefaultWalletId,
-                BrandId: (playerModel == null) ? Guid.Empty : playerModel.BrandId,
-                GameProviderConfigurationId: gameProviderConfigurationId ?? Guid.Empty,
-                Status: (GameRoundStatus)data.Status,
-                ClientStatus: (GameRoundClientStatus)data.ClientStatus,
-                ExternalCreatedOn: data.ExternalCreatedOn!.Value,
-                ExternalClosedOn: data.ExternalClosedOn,
-                BetAmount: data.BetAmount.GetValueOrDefault(0),
-                ValidBetAmount: data.BetAmount.GetValueOrDefault(0),
-                SettleAmount: data.SettleAmount.GetValueOrDefault(0),
-                Commission: data.Commission.GetValueOrDefault(0),
-                Turnover: data.Turnover.GetValueOrDefault(0),
-                PlayerWinLoss: data.PlayerWinLoss.GetValueOrDefault(0),
-                AdditionalData: data.AdditionalData,
-                Success: success);
-
-            _logger.LogInformation("LogOn:{logOn}  Subject:{subject} MessageRequest:{message}",
-                DateTime.Now.ToString("o"),
-                _mongoSetting.GlobPattern,
-                message);
-
-            await _messageSender
-                .PublishAsync(
-                    subject: _mongoSetting.GlobPattern,
-                    data: message.ToBson(),
+                await _gameRoundsWorkServiceClient
+                .RoundMissing(
+                    gameProviderId: gameProviderId,
+                    gameProviderCode: _gameRecordInfo.GameProviderCode,
+                    externalRoundId: data.ExternalRoundId,
+                    gameId: gameId ?? -1,
+                    externalGameId: data.ExternalGameId,
+                    playerCode: playerModel?.PlayerCode ?? string.Empty,
+                    data: JsonSerializer.Serialize(data),
                     cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
+                failureCount++;
+            }
 
             lastGameRecordTime = data.ExternalClosedOn.HasValue ? data.ExternalClosedOn : data.ExternalCreatedOn;
         };

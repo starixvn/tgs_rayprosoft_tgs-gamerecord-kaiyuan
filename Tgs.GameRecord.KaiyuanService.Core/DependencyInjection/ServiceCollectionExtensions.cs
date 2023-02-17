@@ -11,16 +11,12 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddGameRecordCore(
        this IServiceCollection services,
        Action<GameRecordInfoOptions, IServiceProvider> gameRecordInfoOptions,
-       Action<MongoSettingOptions, IServiceProvider> mongoSettingOptions,
        Action<GameCommandClientOptions, IServiceProvider> gameCommandClientOptions,
        Action<GameRecordSchedulesClientOptions, IServiceProvider> gameRecordSchedulesClientOptions,
        Action<GameProvidersClientOptions, IServiceProvider> gameProvidersClientOptions)
         => services
         .AddOptions<GameRecordInfoOptions>()
         .Configure(gameRecordInfoOptions)
-        .Services
-        .AddOptions<MongoSettingOptions>()
-        .Configure(mongoSettingOptions)
         .Services
         .RegisterAllServiceUtilityTypes(
             Assembly.GetExecutingAssembly(),

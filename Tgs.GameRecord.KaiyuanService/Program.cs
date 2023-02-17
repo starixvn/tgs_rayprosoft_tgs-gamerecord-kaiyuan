@@ -7,9 +7,6 @@ using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Tgs.GameRecord.KaiyuanService;
-using Tgs.GameRecord.KaiyuanService.Core;
-using Tgs.MessageQueue.MongoDB.Configuration;
-using MongoMessageQueue = MongoDB.Messaging.MessageQueue;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,11 +58,6 @@ builder.Services
     (options, sp) =>
     {
         var configuration = sp.GetRequiredService<IConfiguration>();
-        configuration.GetSection("MongoSetting").Bind(options);
-    },
-    (options, sp) =>
-    {
-        var configuration = sp.GetRequiredService<IConfiguration>();
         options.BaseUrl = configuration.GetValue<Uri>("GameRecord:GameCommandClientBaseUrl");
     },
     (options, sp) =>
@@ -79,21 +71,8 @@ builder.Services
         options.BaseUrl = configuration.GetValue<Uri>("GameRecord:GameProvidersBaseUrl");
     });
 
-var mongoSetting = builder.Configuration.GetSection("MongoSetting").Get<MongoSettingOptions>();
-
 builder.Services
     .AddMessageQueue()
-    .AddMongoMessageQueue(config =>
-    {
-        _ = config
-        .DefineMessageQueue(
-            "gp.gamerecord.database",
-            sp => new MongoMessageQueueBuilderOptions
-            {
-                MessageQueue = MongoMessageQueue.Default,
-                ConnectionString = sp.GetRequiredService<IConfiguration>().GetConnectionString("MongoMessaging")!
-            });
-    })
      .AddNatsMessageQueue(natsConfig =>
      {
          _ = natsConfig
@@ -106,7 +85,7 @@ builder.Services
          .AddProcessor<ManualMessageHandler>("gp.gamerecord.manual.ky", "gp.gamerecord.manual");
      })
     .ClearAllExchanges()
-    .AddMongoGlobPatternExchange(mongoSetting.GlobPattern, mongoSetting.ManagerName, mongoSetting.QueueName);
+    .AddNatsGlobPatternExchange("*");
 
 builder.Services
      .AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
