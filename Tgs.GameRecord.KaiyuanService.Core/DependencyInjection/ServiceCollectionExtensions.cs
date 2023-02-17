@@ -25,6 +25,7 @@ public static class ServiceCollectionExtensions
         .AddGameCommandClient(gameCommandClientOptions)
         .AddGameRecordSchedulesClient(gameRecordSchedulesClientOptions)
         .AddGameProvidersClient(gameProvidersClientOptions)
+        .AddGameRoundsWorkServiceClient()
         .AddScoped<ISystemClock, SystemClock>()
         .AddScoped<IGameRecordSchedule, GameRecordScheduleRepository>()
         .AddTransient<IUtensil>(sp => ActivatorUtilities.CreateInstance<UtensilRepository>(sp, TimeSpan.FromHours(1)));
