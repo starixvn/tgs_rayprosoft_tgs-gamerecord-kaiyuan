@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Options;
 using Tgs.GameProviders.Client;
-using Tgs.GameRounds.WorkService.Client;
-using Tgs.GameRounds.WorkService.Common.Protos;
+using Tgs.GameRounds.Work.Client;
+using Tgs.GameRounds.Work.Common.Protos;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameRecord.KaiyuanService.Core.ApplicationServices;
@@ -11,18 +11,18 @@ internal class GameRecordService : IGetService<GameRecordQuery, GameRecordResult
 {
     private readonly IGameRecordListClient _client;
     private readonly GameRecordInfoOptions _gameRecordInfo;
-    private readonly IGameRoundsWorkServiceClient _gameRoundsWorkServiceClient;
+    private readonly IGameRoundsWorkClient _gameRoundsWorkClient;
     private readonly IUtensil _utensil;
 
     public GameRecordService(
         IOptions<GameRecordInfoOptions> gameRecordInfoOptions,
         IGameRecordListClient client,
-        IGameRoundsWorkServiceClient gameRoundsWorkServiceClient,
+        IGameRoundsWorkClient gameRoundsWorkClient,
         IUtensil utensil)
     {
         _gameRecordInfo = gameRecordInfoOptions.Value;
         _client = client ?? throw new ArgumentNullException(nameof(client));
-        _gameRoundsWorkServiceClient = gameRoundsWorkServiceClient ?? throw new ArgumentNullException(nameof(gameRoundsWorkServiceClient));
+        _gameRoundsWorkClient = gameRoundsWorkClient ?? throw new ArgumentNullException(nameof(gameRoundsWorkClient));
         _utensil = utensil ?? throw new ArgumentNullException(nameof(utensil));
     }
 
@@ -87,7 +87,7 @@ internal class GameRecordService : IGetService<GameRecordQuery, GameRecordResult
 
             if (success)
             {
-                await _gameRoundsWorkServiceClient
+                await _gameRoundsWorkClient
                 .RoundBidding(
                     gameProviderId: gameProviderId,
                     gameProviderCode: _gameRecordInfo.GameProviderCode,
@@ -115,7 +115,7 @@ internal class GameRecordService : IGetService<GameRecordQuery, GameRecordResult
             }
             else
             {
-                await _gameRoundsWorkServiceClient
+                await _gameRoundsWorkClient
                 .RoundMissing(
                     gameProviderId: gameProviderId,
                     gameProviderCode: _gameRecordInfo.GameProviderCode,
