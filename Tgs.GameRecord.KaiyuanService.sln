@@ -7,14 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameRecord.KaiyuanServi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameRecord.KaiyuanService.Core", "Tgs.GameRecord.KaiyuanService.Core\Tgs.GameRecord.KaiyuanService.Core.csproj", "{E20B5AFF-B1F0-42B7-8B76-A947543A50C4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DC18B46E-05B3-42DD-A361-9EFB7B3ED2F2}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-		CodeMaid.config = CodeMaid.config
-		nuget.config = nuget.config
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.GameRecord.KaiyuanService.Core.UnitTest", "Tgs.GameRecord.KaiyuanService.Core.UnitTest\Tgs.GameRecord.KaiyuanService.Core.UnitTest.csproj", "{7E8E8F2A-2D7F-4589-87F4-6B1E9DF01BCE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameRecord.KaiyuanService.Core.UnitTest", "Tgs.GameRecord.KaiyuanService.Core.UnitTest\Tgs.GameRecord.KaiyuanService.Core.UnitTest.csproj", "{7E8E8F2A-2D7F-4589-87F4-6B1E9DF01BCE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

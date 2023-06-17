@@ -20,9 +20,9 @@ builder.Logging
         options.ParseStateValues = true;
         _ = options.AddFluentdForwardExporter(fluentOptions =>
         {
-            var nodeIp = builder.Configuration.GetValue<string>("NODE_IP");
+            var nodeIp = builder.Configuration.GetValue<string>("NODE_IP")!;
             fluentOptions.Host = nodeIp;
-            fluentOptions.Tag = builder.Configuration.GetValue<string>("OTEL_SERVICE_NAME");
+            fluentOptions.Tag = builder.Configuration.GetValue<string>("OTEL_SERVICE_NAME")!;
             fluentOptions.UseMessagePack();
         });
     });
@@ -42,11 +42,7 @@ builder.Services
     });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    var xmlFileNames = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.xml");
-    foreach (var xmlFileName in xmlFileNames) c.IncludeXmlComments(xmlFileName);
-});
+builder.Services.AddSwaggerGen();
 
 builder.Services
     .AddGameRecordCore((options, sp) =>
@@ -57,19 +53,18 @@ builder.Services
     (options, sp) =>
     {
         var configuration = sp.GetRequiredService<IConfiguration>();
-        options.BaseUrl = configuration.GetValue<Uri>("GameRecord:GameCommandClientBaseUrl");
+        options.BaseUrl = configuration.GetValue<Uri>("GameRecord:GameCommandClientBaseUrl")!;
     },
     (options, sp) =>
     {
         var configuration = sp.GetRequiredService<IConfiguration>();
-        options.BaseUrl = configuration.GetValue<Uri>("GameRecord:GameRecordSchedulesBaseUrl");
+        options.BaseUrl = configuration.GetValue<Uri>("GameRecord:GameRecordSchedulesBaseUrl")!;
     },
     (options, sp) =>
     {
         var configuration = sp.GetRequiredService<IConfiguration>();
-        options.BaseUrl = configuration.GetValue<Uri>("GameRecord:GameProvidersBaseUrl");
+        options.BaseUrl = configuration.GetValue<Uri>("GameRecord:GameProvidersBaseUrl")!;
     });
-
 builder.Services
     .AddMessageQueue()
      .AddNatsMessageQueue(natsConfig =>
@@ -109,16 +104,16 @@ builder.Services
     .Configure<AspNetCoreInstrumentationOptions>(options => options.Filter =
         httpContext => !httpContext.Request.Path.HasValue
             || !httpContext.Request.Path.StartsWithSegments("/swagger")
-            && !httpContext.Request.Path.StartsWithSegments("/health")
+            && !httpContext.Request.Path.StartsWithSegments("/healthz")
             && !httpContext.Request.Path.StartsWithSegments("/profiler/")
+            && !httpContext.Request.Path.StartsWithSegments("/hangfire")
             && !httpContext.Request.Path.StartsWithSegments("/metrics")
             && !new[] { "html", "ico", "png", "jpg" }.Any(
                 ext => httpContext.Request.Path.Value.EndsWith($".{ext}")))
     .AddInterceptionService()
     .AddServiceUtiltiyInterceptors();
 
-builder.Services
-    .AddHealthChecks();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -131,6 +126,6 @@ _ = app.MapControllers();
 
 app.MapHealthChecks("/healthz");
 
-_ = app.UseRegister();
+_ = app.UseRegisterAsync();
 
 app.Run();
