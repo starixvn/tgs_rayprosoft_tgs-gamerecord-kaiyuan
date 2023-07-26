@@ -20,12 +20,12 @@ public class KaiyuanController : ControllerBase
     ///
     ///     Post
     ///         {
-    ///             "apiRecordUrl": "https://wc1-record.kewmn686.com/",
-    ///             "deskey": "706EB65DD6E6DF4C",
-    ///             "md5key": "3E00054B89B31B7A",
+    ///             "apiRecordUrl": "https://wc1-record.hddv1.com/",
+    ///             "deskey": "E2F3A416006F84F8",
+    ///             "md5key": "B563DF2A3DE58DFB",
     ///             "agentId": "200995",
-    ///             "startTime": "2023-07-19T15:50:00+08:00",
-    ///             "endTime": "2023-07-19T16:00:00+08:00"
+    ///             "startTime": "2023-07-26T11:50:00+08:00",
+    ///             "endTime": "2023-07-26T12:00:00+08:00"
     ///         }
     /// </remarks>
     [HttpPost]

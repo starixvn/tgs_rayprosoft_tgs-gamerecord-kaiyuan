@@ -9,18 +9,19 @@ FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 ARG BuildConfiguration=Release
 WORKDIR /src
 COPY ["nuget.config", "."]
-COPY ["Tgs.GameRecord.KaiyuanService/Tgs.GameRecord.KaiyuanService.csproj", "Tgs.GameRecord.KaiyuanService/"]
-COPY ["Tgs.GameRecord.KaiyuanService.Core/Tgs.GameRecord.KaiyuanService.Core.csproj", "Tgs.GameRecord.KaiyuanService.Core/"]
-RUN dotnet restore "Tgs.GameRecord.KaiyuanService/Tgs.GameRecord.KaiyuanService.csproj"
+COPY ["Tgs.GameRecord.Kaiyuan/Tgs.GameRecord.Kaiyuan.csproj", "Tgs.GameRecord.Kaiyuan/"]
+COPY ["Tgs.GameRecord.Kaiyuan.Core/Tgs.GameRecord.Kaiyuan.Core.csproj", "Tgs.GameRecord.Kaiyuan.Core/"]
+COPY ["Tgs.GameRecord.Kaiyuan.Common/Tgs.GameRecord.Kaiyuan.Common.csproj", "Tgs.GameRecord.Kaiyuan.Common/"]
+RUN dotnet restore "Tgs.GameRecord.Kaiyuan/Tgs.GameRecord.Kaiyuan.csproj"
 COPY . .
-WORKDIR "/src/Tgs.GameRecord.KaiyuanService"
-RUN dotnet build "Tgs.GameRecord.KaiyuanService.csproj" -c $BuildConfiguration -o /app/build
+WORKDIR "/src/Tgs.GameRecord.Kaiyuan"
+RUN dotnet build "Tgs.GameRecord.Kaiyuan.csproj" -c $BuildConfiguration -o /app/build
 
 FROM build AS publish
 ARG BuildConfiguration
-RUN dotnet publish "Tgs.GameRecord.KaiyuanService.csproj" -c $BuildConfiguration -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Tgs.GameRecord.Kaiyuan.csproj" -c $BuildConfiguration -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Tgs.GameRecord.KaiyuanService.dll"]
+ENTRYPOINT ["dotnet", "Tgs.GameRecord.Kaiyuan.dll"]
