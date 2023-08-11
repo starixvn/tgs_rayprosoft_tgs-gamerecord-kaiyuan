@@ -19,8 +19,8 @@ public static class ServiceCollectionExtensions
         .RegisterAllServiceUtilityTypes(
             Assembly.GetExecutingAssembly(),
             ServiceLifetime.Transient)
-        .AddGameRoundsWorkClient()
         .AddGameCommandClient(gameCommandClientOptions)
         .AddGameInterfaceKaiyuanClient(gameInterfaceKaiyuanClientOptions)
+        .AddGameRecordHandleClient()
         .AddTransient<IHangfireUtensil, HangfireUtensil>();
 }

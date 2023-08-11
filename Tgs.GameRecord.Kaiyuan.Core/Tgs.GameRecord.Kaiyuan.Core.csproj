@@ -16,6 +16,7 @@
 		<PackageReference Include="System.Linq.Async" Version="6.0.1" />
 		<PackageReference Include="Tgs.GameCommand.Client" Version="0.0.8" />
 		<PackageReference Include="Tgs.GameInterface.Kaiyuan.Client" Version="1.0.2" />
+		<PackageReference Include="Tgs.GameRecord.Handle.Client" Version="0.0.3" />
 		<PackageReference Include="Tgs.MessageQueue.Nats" Version="2.3.1" />
 		<PackageReference Include="TGS.ServiceUtility" Version="0.2.0" />
 		<PackageReference Include="Tgs.MessageQueue" Version="2.3.0" />
