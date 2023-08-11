@@ -22,6 +22,5 @@ public static class ServiceCollectionExtensions
         .AddGameRoundsWorkClient()
         .AddGameCommandClient(gameCommandClientOptions)
         .AddGameInterfaceKaiyuanClient(gameInterfaceKaiyuanClientOptions)
-        .AddTransient<IUtensil>(sp => ActivatorUtilities.CreateInstance<UtensilRepository>(sp, TimeSpan.FromHours(1)))
         .AddTransient<IHangfireUtensil, HangfireUtensil>();
 }
