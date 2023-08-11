@@ -20,7 +20,7 @@ public class KaiyuanController : ControllerBase
     ///
     ///     Post
     ///         {
-    ///             "apiRecordUrl": "https://wc1-record.hddv1.com/",
+    ///             "apiRecordUrl": "https://wc1-record.uaphl791.com/",
     ///             "deskey": "E2F3A416006F84F8",
     ///             "md5key": "B563DF2A3DE58DFB",
     ///             "agentId": "72412",
