@@ -18,28 +18,34 @@ internal class HandleRecordCommandService : ICommandService<HandleRecordCommand>
         _client = client ?? throw new ArgumentNullException(nameof(client));
     }
 
-    public async ValueTask ExecuteAsync(HandleRecordCommand command, CancellationToken cancellationToken = default)
+    public ValueTask ExecuteAsync(HandleRecordCommand command, CancellationToken cancellationToken = default)
     {
-        var clientStatus = (command.Record.WinLoss.ToDecimal().GetValueOrDefault(0) > 0) ? GameRecordClientStatus.Win : GameRecordClientStatus.Loss;
+        var wagerState = (command.Record.WinLoss.ToDecimal().GetValueOrDefault(0) > 0) ? WagerStates.Win : WagerStates.Lose;
 
-        await _client
+        return _client
         .MessageAsync(
             gameProviderCode: _gameRecordInfo.GameProviderCode,
-            externalRoundId: command.Record.ExternalRoundId,
-            externalGameId: command.Record.ExternalGameId,
             playerCode: command.Record.PlayerCode,
-            status: GameRecordStatus.Closed,
-            clientStatus: clientStatus,
+            wagerState: wagerState,
+            wagerType: WagerTypes.Normal,
+            freeGameState: FreeGameStates.None,
+            gambleState: GambleStates.None,
+            cashoutState: CashoutStates.None,
+            resettleState: ResettleStates.None,
+            externalRoundId: command.Record.ExternalRoundId,
+            externalWagerId: command.Record.ExternalRoundId,
+            externalGameId: command.Record.ExternalGameId,
             externalCreatedOn: command.Record.ExternalCreatedOn.ToDateTimeOffset(),
             externalClosedOn: command.Record.ExternalClosedOn.ToDateTimeOffset(),
+            externalPayoffOn: command.Record.ExternalClosedOn.ToDateTimeOffset(),
+            externalResettleOn: DateTimeOffset.UnixEpoch,
             bet: command.Record.Bet.ToDecimal().GetValueOrDefault(0),
             validBet: command.Record.ValidBet.ToDecimal().GetValueOrDefault(0),
             settle: command.Record.Settle.ToDecimal().GetValueOrDefault(0),
             commission: command.Record.Commission.ToDecimal().GetValueOrDefault(0),
             turnover: command.Record.Turnover.ToDecimal().GetValueOrDefault(0),
-            playerWinLoss: command.Record.WinLoss.ToDecimal().GetValueOrDefault(0),
+            winLoss: command.Record.WinLoss.ToDecimal().GetValueOrDefault(0),
             additionalData: command.Record.AdditionalData,
-            cancellationToken: cancellationToken)
-        .ConfigureAwait(false);
+            cancellationToken: cancellationToken);
     }
 }

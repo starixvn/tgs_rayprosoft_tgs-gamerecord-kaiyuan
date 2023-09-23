@@ -3,8 +3,8 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Tgs.GameRecord.Kaiyuan.Common;
-using Tgs.MessageQueue;
 using Tgs.ServiceUtility;
+using Valhalla.MessageQueue;
 
 namespace Tgs.GameRecord.Kaiyuan.Core.JobApplicationServices;
 

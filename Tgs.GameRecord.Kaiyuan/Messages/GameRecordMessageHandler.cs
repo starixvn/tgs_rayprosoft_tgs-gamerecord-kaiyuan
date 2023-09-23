@@ -2,8 +2,8 @@
 using System.Text.Json;
 using Tgs.GameRecord.Kaiyuan.Common;
 using Tgs.GameRecord.Kaiyuan.Core.ApplicationServices;
-using Tgs.MessageQueue;
 using Tgs.ServiceUtility;
+using Valhalla.MessageQueue;
 
 namespace Tgs.GameRecord.Kaiyuan.Messages;
 
