@@ -23,8 +23,8 @@ internal class PullRecordCommandService : ICommandService<PullRecordCommand>
 
     public async ValueTask ExecuteAsync(PullRecordCommand command, CancellationToken cancellationToken = default)
     {
-        var gameRecords = await _client
-            .GameRecordAsync(
+        var infos = await _client
+            .GameWagerAsync(
             apiUrl: command.ApiUrl,
             deskey: command.Deskey,
             md5key: command.Md5key,
@@ -35,21 +35,21 @@ internal class PullRecordCommandService : ICommandService<PullRecordCommand>
             .ToArrayAsync(
             cancellationToken: cancellationToken)
             .ConfigureAwait(false)
-            ?? Enumerable.Empty<GameRecordInfo>();
+            ?? Enumerable.Empty<GameWagerInfo>();
 
-        foreach (var gameRecord in gameRecords)
+        foreach (var info in infos)
         {
             try
             {
                 await _service
-                .ExecuteAsync(
-                     command: new HandleRecordCommand(gameRecord),
-                     cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
+                    .ExecuteAsync(
+                    command: new HandleRecordCommand(info),
+                    cancellationToken: cancellationToken)
+                    .ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "LogOn:{logOn} Message: An exception occurred in this game record.({gameRecord})", DateTime.Now.ToString("o"), gameRecord);
+                _logger.LogError(ex, "LogOn:{logOn} Message: An exception occurred in this game record.({info})", DateTime.Now.ToString("o"), info);
             }
         }
     }
