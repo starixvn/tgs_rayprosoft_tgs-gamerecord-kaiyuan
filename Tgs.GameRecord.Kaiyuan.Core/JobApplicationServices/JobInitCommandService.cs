@@ -100,15 +100,17 @@ internal class JobInitCommandService : ICommandService<JobInitCommand>
                 }
 
                 var jobExecuteCommand = new JobExecuteCommand(
-                   ApiUrl: apiUrl,
-                   Deskey: deskey,
-                   Md5key: md5key,
-                   AgentId: agentId);
+                    ApiUrl: apiUrl,
+                    Deskey: deskey,
+                    Md5key: md5key,
+                    AgentId: agentId);
 
-                gameProviderAgentMapper.Add(gameProviderConfig.Name, jobExecuteCommand);
+                gameProviderAgentMapper.Add(agentId, jobExecuteCommand);
+
+                var recurringJobId = $"{gameProviderConfig.Name}|{gameProviderConfig.GameProviderConfigId}";
 
                 RecurringJob.AddOrUpdate<IHangfireUtensil>(
-                    recurringJobId: gameProviderConfig.Name,
+                    recurringJobId: recurringJobId,
                     methodCall: service => service.JobExecuteAsync(jobExecuteCommand),
                     cronExpression: Cron.Minutely(),
                     options: _recurringJobOptions);
