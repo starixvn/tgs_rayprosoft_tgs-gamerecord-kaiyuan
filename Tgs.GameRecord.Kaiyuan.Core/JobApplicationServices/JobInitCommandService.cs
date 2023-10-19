@@ -107,7 +107,7 @@ internal class JobInitCommandService : ICommandService<JobInitCommand>
 
                 gameProviderAgentMapper.Add(agentId, jobExecuteCommand);
 
-                var recurringJobId = $"{gameProviderConfig.Name}|{gameProviderConfig.GameProviderConfigId}";
+                var recurringJobId = $"{gameProviderConfig.Name}|{agentId}|{gameProviderConfig.GameProviderConfigId}";
 
                 RecurringJob.AddOrUpdate<IHangfireUtensil>(
                     recurringJobId: recurringJobId,
