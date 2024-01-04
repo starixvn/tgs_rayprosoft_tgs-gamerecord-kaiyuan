@@ -8,34 +8,23 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.GameRecord.Kaiyuan.Core.JobApplicationServices;
 
-internal class JobExecuteCommandService : ICommandService<JobExecuteCommand>
+internal class JobExecuteCommandService(
+    ILogger<JobExecuteCommandService> logger,
+    IOptions<GameRecordInfoOptions> options,
+    IMessageSender messageSender) : ICommandService<JobExecuteCommand>
 {
-    private readonly GameRecordInfoOptions _gameRecordInfo;
-    private readonly double _intervalMinutes;
-    private readonly ILogger<JobExecuteCommandService> _logger;
-    private readonly IMessageSender _messageSender;
-
-    public JobExecuteCommandService(
-        ILogger<JobExecuteCommandService> logger,
-        IOptions<GameRecordInfoOptions> options,
-        IMessageSender messageSender)
-    {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _gameRecordInfo = options.Value;
-        _messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
-        _intervalMinutes = _gameRecordInfo.IntervalMinutesMax < _gameRecordInfo.IntervalMinutes
-            ? _gameRecordInfo.IntervalMinutesMax
-            : _gameRecordInfo.IntervalMinutesMinimum > _gameRecordInfo.IntervalMinutes
-            ? _gameRecordInfo.IntervalMinutesMinimum
-            : _gameRecordInfo.IntervalMinutes;
-    }
+    private readonly double _intervalMinutes = options.Value.IntervalMinutesMax < options.Value.IntervalMinutes
+        ? options.Value.IntervalMinutesMax
+        : options.Value.IntervalMinutesMinimum > options.Value.IntervalMinutes
+        ? options.Value.IntervalMinutesMinimum
+        : options.Value.IntervalMinutes;
 
     public ValueTask ExecuteAsync(JobExecuteCommand command, CancellationToken cancellationToken = default)
     {
         var endTime = DateTimeOffset.ParseExact(DateTimeOffset.UtcNow.ToString(@"yyyy-MM-dd\THH:mm:00K"), @"yyyy-MM-dd\THH:mm:00K", null, styles: System.Globalization.DateTimeStyles.RoundtripKind);
         var startTime = endTime.AddMinutes(_intervalMinutes * -1);
 
-        var parameters = new GameRecordMessage
+        var parameters = new KaiyuanGameRecordMessage
         {
             ApiUrl = command.ApiUrl,
             Deskey = command.Deskey,
@@ -45,11 +34,10 @@ internal class JobExecuteCommandService : ICommandService<JobExecuteCommand>
             EndTime = endTime
         };
 
-        _logger.LogInformation("LogOn:{logOn} Parameters:{parameters}", DateTime.Now.ToString("u"), parameters);
+        logger.LogInformation("LogOn:{logOn} Parameters:{parameters}", DateTime.Now.ToString("u"), parameters);
 
-        return _messageSender
-            .PublishAsync(
-            subject: "gp.gamerecord.schedule.ky",
+        return messageSender.PublishAsync(
+            subject: KaiyuanNatsConst.SchedulePublish,
             data: Encoding.UTF8.GetBytes(JsonSerializer.Serialize(parameters)),
             cancellationToken: cancellationToken);
     }

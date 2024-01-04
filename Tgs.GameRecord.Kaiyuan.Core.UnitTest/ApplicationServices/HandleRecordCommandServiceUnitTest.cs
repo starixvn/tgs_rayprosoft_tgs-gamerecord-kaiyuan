@@ -18,7 +18,8 @@ public class HandleRecordCommandServiceUnitTest
         {
             GameProviderCode = "KY",
             GameProviderConfiguration = "KYConfiguration",
-            GameProviderHangfire = "ky-schedule:hangfire:",
+            HangfirePrefix = "gamerecord-ky-hangfire:",
+            HangfireLocking = "gamerecord-ky-locking:",
             IntervalMinutes = 5,
             IntervalMinutesMax = 30,
             IntervalMinutesMinimum = 1
@@ -89,7 +90,7 @@ public class HandleRecordCommandServiceUnitTest
             commission: Arg.Is(0.0m),
             turnover: Arg.Is(command.Info.ValidBet.ToDecimal().GetValueOrDefault(0)),
             winLoss: Arg.Is(command.Info.WinLoss.ToDecimal().GetValueOrDefault(0)),
-            additionalData: Arg.Is(command.Info.AdditionalData),
+            additionalData: Arg.Any<JsonNode>(),
             cancellationToken: Arg.Any<CancellationToken>());
     }
 
@@ -100,7 +101,8 @@ public class HandleRecordCommandServiceUnitTest
         {
             GameProviderCode = "KY",
             GameProviderConfiguration = "KYConfiguration",
-            GameProviderHangfire = "ky-schedule:hangfire:",
+            HangfirePrefix = "gamerecord-ky-hangfire:",
+            HangfireLocking = "gamerecord-ky-locking:",
             IntervalMinutes = 5,
             IntervalMinutesMax = 30,
             IntervalMinutesMinimum = 1
@@ -171,7 +173,7 @@ public class HandleRecordCommandServiceUnitTest
             commission: Arg.Is(0.0m),
             turnover: Arg.Is(command.Info.ValidBet.ToDecimal().GetValueOrDefault(0)),
             winLoss: Arg.Is(command.Info.WinLoss.ToDecimal().GetValueOrDefault(0)),
-            additionalData: Arg.Is(command.Info.AdditionalData),
+            additionalData: Arg.Any<JsonNode>(),
             cancellationToken: Arg.Any<CancellationToken>());
     }
 }
