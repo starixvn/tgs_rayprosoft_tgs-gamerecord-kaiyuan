@@ -7,39 +7,41 @@ using Tgs.ServiceUtility;
 namespace Tgs.GameRecord.Kaiyuan.Core.ApplicationServices;
 
 internal class HandleRecordCommandService(
-    IOptions<GameRecordInfoOptions> options,
-    IGameRecordHandleClient client) : ICommandService<HandleRecordCommand>
+	IOptions<GameRecordInfoOptions> options,
+	IGameRecordHandleClient client) : ICommandService<HandleRecordCommand>
 {
-    private readonly GameRecordInfoOptions _gameRecordInfo = options.Value;
+	private readonly GameRecordInfoOptions _gameRecordInfo = options.Value;
 
-    public ValueTask ExecuteAsync(HandleRecordCommand command, CancellationToken cancellationToken = default)
-    {
-        var wagerState = (command.Info.WinLoss.ToDecimal().GetValueOrDefault(0) > 0) ? WagerStates.Win : WagerStates.Lose;
+	public ValueTask ExecuteAsync(HandleRecordCommand command, CancellationToken cancellationToken = default)
+	{
+		var betState = (command.Info.WinLoss.ToDecimal().GetValueOrDefault(0) > 0) ? BetState.Win : BetState.Loss;
 
-        return client
-        .MessageAsync(
-            gameProviderCode: _gameRecordInfo.GameProviderCode,
-            playerCode: command.Info.PlayerCode,
-            wagerState: wagerState,
-            wagerType: WagerTypes.Normal,
-            freeGameState: FreeGameStates.None,
-            gambleState: GambleStates.None,
-            cashoutState: CashoutStates.None,
-            resettleState: ResettleStates.None,
-            externalRoundId: command.Info.ExternalWagerId,
-            externalWagerId: command.Info.ExternalWagerId,
-            externalGameId: command.Info.ExternalGameId,
-            externalCreatedOn: command.Info.ExternalCreatedOn.ToDateTimeOffset(),
-            externalClosedOn: command.Info.ExternalClosedOn.ToDateTimeOffset(),
-            externalPayoffOn: command.Info.ExternalClosedOn.ToDateTimeOffset(),
-            externalResettleOn: DateTimeOffset.UnixEpoch,
-            bet: command.Info.Bet.ToDecimal().GetValueOrDefault(0),
-            validBet: command.Info.ValidBet.ToDecimal().GetValueOrDefault(0),
-            settle: command.Info.Settle.ToDecimal().GetValueOrDefault(0),
-            commission: command.Info.Commission.ToDecimal().GetValueOrDefault(0),
-            turnover: command.Info.ValidBet.ToDecimal().GetValueOrDefault(0),
-            winLoss: command.Info.WinLoss.ToDecimal().GetValueOrDefault(0),
-            additionalData: JsonNode.Parse(command.Info.AdditionalData)!,
-            cancellationToken: cancellationToken);
-    }
+		return client.RequestPublishAsyncAsync(
+			source: new Handle.Client.Models.GameRecordRequest(
+				GameProviderCode: _gameRecordInfo.GameProviderCode,
+				PlayerCode: command.Info.PlayerCode,
+				ExternalRoundId: command.Info.ExternalWagerId,
+				ExternalBetId: command.Info.ExternalWagerId,
+				ExternalGameId: command.Info.ExternalGameId,
+				ExternalCreatedOn: command.Info.ExternalCreatedOn.ToDateTimeOffset(),
+				ExternalClosedOn: command.Info.ExternalClosedOn.ToDateTimeOffset(),
+				ExternalPayoffOn: command.Info.ExternalClosedOn.ToDateTimeOffset(),
+				ExternalResettleOn: DateTimeOffset.UnixEpoch,
+				BetState: betState,
+				BetType: BetType.Normal,
+				FreeGameState: FreeGameState.None,
+				GambleState: GambleState.None,
+				CashoutState: CashoutState.None,
+				ResettleState: ResettleState.None,
+				JackpotState: JackpotState.None,
+				Bet: command.Info.Bet.ToDecimal().GetValueOrDefault(0),
+				ValidBet: command.Info.ValidBet.ToDecimal().GetValueOrDefault(0),
+				Settle: command.Info.Settle.ToDecimal().GetValueOrDefault(0),
+				Commission: command.Info.Commission.ToDecimal().GetValueOrDefault(0),
+				Turnover: command.Info.ValidBet.ToDecimal().GetValueOrDefault(0),
+				WinLoss: command.Info.WinLoss.ToDecimal().GetValueOrDefault(0),
+				Jackpot: 0.0M),
+			additionalData: JsonNode.Parse(command.Info.AdditionalData)!,
+			cancellationToken: cancellationToken);
+	}
 }
