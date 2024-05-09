@@ -40,10 +40,7 @@ builder.Services
 		options.Filters.Add(new ProducesAttribute(MediaTypeNames.Application.Json));
 		options.Filters.Add(new ConsumesAttribute(MediaTypeNames.Application.Json));
 	})
-	.AddJsonOptions(options =>
-	{
-		options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-	});
+	.AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

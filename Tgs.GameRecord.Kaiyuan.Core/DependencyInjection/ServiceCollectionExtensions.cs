@@ -19,7 +19,6 @@ public static class ServiceCollectionExtensions
 			ServiceLifetime.Transient)
 		.AddGameCommandClient(gameCommandClientOptions)
 		.AddGameInterfaceKaiyuanClient(gameInterfaceKaiyuanClientOptions)
-		.AddGameRecordHandleClient()
 		.AddTransient<IHangfireUtensil, HangfireUtensil>()
 		.AddTransient<IHangfireLock>(sp => ActivatorUtilities.CreateInstance<HangfireLock>(sp, redisDatabaseResolver(sp)));
 }
