@@ -9,8 +9,10 @@ data:
       "Logging": {
         "LogLevel": {
           "Default": "Warning",
-          "Tgs.GameRecord.Kaiyuan.Messages": "Information",
-          "Tgs.GameRecord.Kaiyuan.Core.ApplicationServices.HandleRecordCommandService": "Information"
+          "Grpc.Net.Client.Balancer": "Debug",
+          "Tgs.GameRecord.Kaiyuan.Messages.ManualMessageHandler": "Information",
+          "Tgs.GameRecord.Kaiyuan.Messages.ScheduleMessageHandler": "Warning",
+          "Tgs.GameRecord.Kaiyuan.Core.ApplicationServices.HandleRecordCommandService": "Warning"
         }
       },
       "GameRecord": {
