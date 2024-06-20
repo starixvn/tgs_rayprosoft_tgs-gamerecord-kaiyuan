@@ -9,7 +9,8 @@ data:
       "Logging": {
         "LogLevel": {
           "Default": "Warning",
-          "Grpc.Net.Client.Balancer": "Debug",
+          "Grpc.Net.Client.Balancer": "Warning",
+          "Grpc.Net.Client.Balancer.DnsResolver": "Debug",
           "Tgs.GameRecord.Kaiyuan.Messages.ManualMessageHandler": "Information",
           "Tgs.GameRecord.Kaiyuan.Messages.ScheduleMessageHandler": "Warning",
           "Tgs.GameRecord.Kaiyuan.Core.ApplicationServices.HandleRecordCommandService": "Warning"
